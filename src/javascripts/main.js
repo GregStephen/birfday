@@ -1,4 +1,11 @@
 import 'bootstrap';
 import '../styles/main.scss';
+import auth from './components/auth/auth';
+import birfday from './components/birfday/birfday';
 
-console.error('hey');
+const init = () => {
+  auth.authStringBuilder();
+  birfday.birfdayStringBuilder();
+};
+
+init();
