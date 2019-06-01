@@ -5,10 +5,11 @@ import util from '../../helpers/util';
 
 const createNewFriend = (e) => {
   e.preventDefault();
+  const { uid } = firebase.auth().currentUser;
   const newFriend = {
     name: document.getElementById('name').value,
     email: document.getElementById('email').value,
-    uid: firebase.auth().currentUser.uid,
+    uid,
   };
   friendsData.addNewFriend(newFriend)
     .then(() => {
@@ -16,6 +17,8 @@ const createNewFriend = (e) => {
       document.getElementById('email').value = '';
       document.getElementById('birfday').classList.remove('hide');
       document.getElementById('new-friend').classList.add('hide');
+      // eslint-disable-next-line no-use-before-define
+      getFriends(uid);
     })
     .catch(err => console.error('no new friend', err));
 };
@@ -26,10 +29,22 @@ const newFriendButton = () => {
   document.getElementById('saveNewFriend').addEventListener('click', createNewFriend);
 };
 
-const showFriends = () => {
-  const domString = '<button id="add-friend-button" class="btn btn-outline-danger">Add Friend</button>';
+const showFriends = (friends) => {
+  let domString = '<button id="add-friend-button" class="btn btn-outline-danger">Add Friend</button>';
+  friends.forEach((friend) => {
+    domString += `<h3>${friend.name}</h3>`;
+  });
   util.printToDom('friends', domString);
   document.getElementById('add-friend-button').addEventListener('click', newFriendButton);
 };
 
-export default { showFriends };
+const getFriends = (uid) => {
+  friendsData.getFriendsByUid(uid)
+    .then((friends) => {
+      console.error('friends', friends);
+      showFriends(friends);
+    })
+    .catch(err => console.error('no friends', err));
+};
+
+export default { getFriends };
