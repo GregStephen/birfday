@@ -2,6 +2,9 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import friendsData from '../../helpers/data/friendsData';
 import util from '../../helpers/util';
+import birfdayData from '../../helpers/data/birfdayData';
+import rsvpData from '../../helpers/data/rsvpData';
+import SMASH from '../../helpers/smash';
 
 const createNewFriend = (e) => {
   e.preventDefault();
@@ -89,7 +92,14 @@ const showFriends = (friends) => {
 const getFriends = (uid) => {
   friendsData.getFriendsByUid(uid)
     .then((friends) => {
-      showFriends(friends);
+      birfdayData.getBirfdayByUid(uid)
+        .then((bday) => {
+          rsvpData.getRsvpsByBirthdayId(bday.id).then((rsvps) => {
+            const finalFriends = SMASH.friendRsvps(friends, rsvps);
+            console.error(finalFriends);
+            showFriends(finalFriends);
+          });
+        });
     })
     .catch(err => console.error('no friends', err));
 };
